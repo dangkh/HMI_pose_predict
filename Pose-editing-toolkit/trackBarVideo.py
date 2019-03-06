@@ -15,8 +15,14 @@ table = []
 img = None
 pos = 0
 cap = 0
-dang_window_size = [800,800]
+dang_window_size = [600,600]
+draged_list = []
+edited = False
 
+# parameter for tracking Lucas
+lk_params = dict( winSize  = (15,15),
+                  maxLevel = 2,
+                  criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.03))
 
 #Draw skeleton
 def draw_skeleton(inputframe, one_ske, table):
@@ -62,10 +68,21 @@ def checkNearby(m, one_ske):# m, r, p stands for mouse, radius, point (joint)
 			return k
 		k = k + 1
 	return -1
+
+#Tracking function
+
+
+
+
+def tracking_OF(old_frame, frame_gray, point_track):
+    ske_new, st, err = cv2.calcOpticalFlowPyrLK(old_frame, frame_gray, point_track, None, **lk_params)
+    return ske_new
+
+
 #Drag function
 moving = False
 def click_and_drag(event, x, y, flags, param):
-	global moving, pos, img
+	global moving, pos, img, edited
 	if event == cv2.EVENT_LBUTTONDOWN:
 		#Check click nearby joint with radius of r pixcels
 		if checkNearby((x,y), ske[pos]) >= 0:
@@ -74,6 +91,8 @@ def click_and_drag(event, x, y, flags, param):
 			moving = False
 	if event == cv2.EVENT_MOUSEMOVE:
 		if moving:
+			edited = True
+			draged_list[pos] = True
 			#update moving joint
 			k = checkNearby((x,y), ske[pos])
 			if k >= 0:
@@ -107,13 +126,13 @@ colors = gen_colors()
 
 def run(filename):
 
-    global table, ske, img, cap
+    global table, ske, img, cap, draged_list
+
     table = readLookupTable("lookup.skeleton")
     ske = readSkeleton(filename.split('.')[0] + ".skeleton")# Read the stored skeleton
-    
     cap = cv2.VideoCapture(filename)
     length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    
+    draged_list = [False] * length
     cv2.namedWindow('mywindow', cv2.WINDOW_NORMAL)
     
     cv2.setMouseCallback('mywindow',click_and_drag)
@@ -135,4 +154,4 @@ def run(filename):
     #        break
     cap.release()
     cv2.destroyAllWindows()
-    return ske
+    return ske, edited

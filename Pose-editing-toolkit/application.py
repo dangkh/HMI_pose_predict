@@ -1,5 +1,6 @@
 import sys
 import Tkinter as tk
+from tkinter import messagebox
 from tkFileDialog import askopenfilename
 from trackBarVideo import run
 from motionTrack import runMotionTrack
@@ -26,7 +27,11 @@ def openfile():
        if not os.path.exists(filename[0:filename.rfind('/')]+'/lookup.skeleton'):    
            lblText.config(text='Lookup skeleton file does not exist')
        else:
-           ske = run(filename)
+           ske, edited = run(filename)
+           if edited:
+             answer = messagebox.askyesno("Saved", "Do you want to save your edited")
+             if answer == True:
+              saveSkeleton(ske, inputName + ".skeleton")
 
 def callMotionTrack():
    global inputName, ske
