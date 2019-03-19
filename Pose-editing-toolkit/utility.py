@@ -68,6 +68,11 @@ def readSkeleton(filename):
 			tmp.append(one_ske[0])
 			tmp.append(one_ske[4])
 			tmp.append(one_ske[5])
+		# make sure not empty ske
+		if len(tmp) > 0 :
+			valid_ske = tmp
+		else:
+			tmp = valid_ske
 		ske.append(tmp)
 	return ske
 

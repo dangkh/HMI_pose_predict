@@ -13,25 +13,29 @@ inputName = "noname" #name of the input file without extension
 ske = []
 
 def openfile():
-   global inputName, ske
-   filename = askopenfilename(parent=root)
-   # obj,fps,width,height=readvid(filename)
-   # ske = run_predict_pose(obj, width, height)
-   if (len(filename) <> 0):
-       listName = filename.split('/')
-       inputFile = listName[-1].split('.')
-       inputName = inputFile[0]
-       if not os.path.exists(filename[0:filename.rfind('/')]+'/'+inputName+'.skeleton'):
-           print filename[0:filename.rfind('/')]+inputName+'.skeleton'
-           lblText.config(text='Corresponding skeleton file does not exist')
-       if not os.path.exists(filename[0:filename.rfind('/')]+'/lookup.skeleton'):    
-           lblText.config(text='Lookup skeleton file does not exist')
-       else:
-           ske, edited = run(filename)
-           if edited:
-             answer = messagebox.askyesno("Saved", "Do you want to save your edited")
-             if answer == True:
-              saveSkeleton(ske, inputName + ".skeleton")
+    global inputName, ske
+    filename = askopenfilename(parent=root)
+    # obj,fps,width,height=readvid(filename)
+    # ske = run_predict_pose(obj, width, height)
+    try:
+      if (len(filename) <> 0):
+        listName = filename.split('/')
+        inputFile = listName[-1].split('.')
+        inputName = inputFile[0]
+        if not os.path.exists(filename[0:filename.rfind('/')]+'/'+inputName+'.skeleton'):
+          print filename[0:filename.rfind('/')]+inputName+'.skeleton'
+          lblText.config(text='Corresponding skeleton file does not exist')
+        if not os.path.exists(filename[0:filename.rfind('/')]+'/lookup.skeleton'):    
+          lblText.config(text='Lookup skeleton file does not exist')
+        else:
+          ske, edited = run(filename)
+          if edited:
+            answer = messagebox.askyesno("Saved", "Do you want to save your edited")
+            if answer == True:
+              saveSkeleton(ske, inputName + ".skeleton")  
+    except Exception as e:
+      print "Please run pose first"
+   
 
 def callMotionTrack():
    global inputName, ske
